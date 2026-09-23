@@ -340,7 +340,19 @@ export function createApp(bindings = {}) {
             if (!originalParam) return c.text('Short URL not found', 404);
 
             const url = new URL(c.req.url);
-            return c.redirect(`${url.origin}/${prefix}${originalParam}`);
+
+            const target = new URL(
+                `${url.origin}/${prefix}${originalParam}`
+            );
+            
+            // 保留 token
+            const token = url.searchParams.get('token');
+            
+            if (token) {
+                target.searchParams.set('token', token);
+            }
+            
+            return c.redirect(target.toString());
         } catch (error) {
             return handleError(c, error, runtime.logger);
         }
